@@ -8,7 +8,7 @@
 3. documents 폴더
    - RAG 검색 대상 pdf, txt, hwp 파일들이 들어있는 폴더.
 5. chat_test.ipynb
-   - 확인용 노트북 파일.
+   - 질의응답 확인용 노트북 파일.
 7. embedding_model.py
    - 메인 모듈. 인덱싱 임베딩하는 함수, 질문 보내고 질문 받아오는 함수 등.
 8. path.json
