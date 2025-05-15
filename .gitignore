@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.db
+*.sqlite3
+
+# Jupyter
+notebooks/
+
+# Virtual Environment
+venv/
+
+# VSCode
+.vscode/
+.settings/
+
+# ChromaDB 저장소 (벡터 DB)
+data/chroma_db/
+
+# 환경설정 파일
+.env
+config/secrets.toml
+
+# 기타
+*.log
+*.bak
