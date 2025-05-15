@@ -14,10 +14,20 @@
 5. path.json
    - 인식 오류 막기 위해 directory_path 넣어둔 파일.
 
-## 실행법
+## 아나콘다로 실행법
 1. 아나콘다 프롬프트 해당 가상환경 실행 및 해당 디렉토리 진입 C:\Users\KIC\rag-test01\lag-api
 2. python embedding_model.py로 모듈 실행 =>> Flask 서버 가동
 3. chat_test.ipynb 파일 통해서 "RAG 로컬 LLM과 소통"
+
+## VSCode로 실행법
+1. git bash에서 아나콘다 가상환경 실행
+   - VSCode의 git bash에서 아나콘다 가상환경 실행법
+source ~/anaconda3/Scripts/activate
+conda activate rag-test01
+
+2. python embedding_model.py로 Flask 서버 가동.
+3. 또 다른 git bash에서 아나콘다 가상환경 실행.
+4. python chat_test.py로 RAG 로컬 LLM과 소통.
 
 -----------------
 
