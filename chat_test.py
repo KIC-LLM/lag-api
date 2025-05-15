@@ -2,14 +2,6 @@ import textwrap
 import requests
 import json
 
-'''
-1. embedding_model.py 파일을 실행시켜 Flask 서버를 가동.
-2. 아래 query_text에다가 원하는 질문 문자열을 입력.
-3. chat_test.py 실행(이 모듈).
-4. HTTP POST 요청을 통해 embedding_model.py 파일의 query() 함수 실행되어 결과 반환.
-5. 받아온 결과를 파싱하여 결과 출력.
-'''
-
 # 요청 보낼 API URL
 url = "http://localhost:5000/query"
 
