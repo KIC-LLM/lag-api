@@ -22,6 +22,7 @@ data/chroma_db/
 # 환경설정 파일
 .env
 config/secrets.toml
+config/
 
 # 기타
 *.log

@@ -1,5 +1,6 @@
 from flask import request, jsonify
-from app.vector_store import init_chroma, index_documents_to_collection, query_collection
+from app.vector_store import init_chroma, index_documents_to_collection
+from app.query_engine import run_rag_query
 
 def register_routes(app):
     chroma_client, collection = init_chroma()
@@ -27,7 +28,7 @@ def register_routes(app):
         if not question:
             return jsonify({"error": "쿼리 없음"}), 400
         try:
-            result = query_collection(collection, question)
+            result = run_rag_query(collection, question)
             return jsonify(result)
         except Exception as e:
             return jsonify({"error": str(e)}), 500

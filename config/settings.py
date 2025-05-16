@@ -9,7 +9,7 @@ OLLAMA_API_URL = os.getenv("OLLAMA_API_URL", "http://localhost:11434/api/generat
 OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "gemma3")
 
 # [🔐 외부 API 키]
-LAW_API_KEY = os.getenv("LAW_API_KEY")
+LAW_API_KEY = os.getenv("yoonjs1459")
 
 # [🧱 ChromaDB 설정]
 CHROMA_COLLECTION_NAME = os.getenv("CHROMA_COLLECTION_NAME", "documents")

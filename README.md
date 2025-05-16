@@ -16,7 +16,7 @@ project-root/
 ├── app/
 │   ├── **init**.py          # Flask 앱 초기화
 │   ├── routes.py            # API 라우터 (/index, /query)
-│   ├── embedding.py         # 임베딩 모델 정의 (SentenceTransformer)
+│   ├── embedding_custom.py          # 임베딩 모델 정의 (SentenceTransformer)
 │   ├── vector\_store.py      # ChromaDB 벡터 저장소 초기화 및 문서 인덱싱
 │   ├── document\_loader.py   # TXT/PDF/HWP 문서 로딩 및 분할
 │   ├── query\_engine.py      # Ollama 호출 및 응답 처리
@@ -34,6 +34,7 @@ project-root/
 │
 ├── .env                     # 환경 변수 설정 파일 (Git 제외)
 ├── run.py                   # Flask 실행 스크립트
+├── query.html               # Flask 실행 화면
 ├── requirements.txt         # Python 의존성 목록
 └── README.md
 

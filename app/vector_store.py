@@ -1,7 +1,7 @@
 import chromadb
 from chromadb.utils import embedding_functions
-from app.embedding import CustomEmbeddingFunction
 from app.document_loader import load_and_split_documents
+from app.embedding_custom import CustomEmbeddingFunction
 
 # ChromaDB 클라이언트 및 컬렉션 초기화
 def init_chroma(collection_name="documents", db_path="./data/chroma_db"):
