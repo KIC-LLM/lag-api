@@ -1,128 +1,106 @@
 import os
 import requests
-from typing import Dict, List, Optional, Union, Any
+from bs4 import BeautifulSoup
+from dotenv import load_dotenv
 
-class LawAPI:
-    """국가법령정보 API를 처리하는 클래스"""
+load_dotenv()
+LAW_API_KEY = os.getenv("LAW_API_KEY")
+
+
+def fetch_law_detail_by_mst(mst: str, max_lines: int = 20) -> str:
+    """
+    국가법령정보센터 API를 통해 MST에 해당하는 법령 조문을 HTML에서 직접 추출
+    - HTML 본문에 조문이 포함되어 있으면 .get_text()로 추출
+    - 그렇지 않으면 iframe 링크를 fallback으로 제공
+    """
+    base_url = "http://www.law.go.kr/DRF/lawService.do"
+    params = {
+        "OC": LAW_API_KEY,
+        "target": "law",
+        "type": "HTML",
+        "MST": mst
+    }
+
+    print(f"📤 법령 API HTML 요청: {params}")
+    try:
+        response = requests.get(base_url, params=params, timeout=10)
+        print(f"📥 응답 코드: {response.status_code}")
+        response.raise_for_status()
+    except Exception as e:
+        print(f"[HTML 요청 실패] {str(e)}")
+        return "[법령 본문 요청 실패]"
+
+    # HTML 파싱
+    soup = BeautifulSoup(response.text, "html.parser")
+
+    # 조문이 HTML 본문에 포함된 경우 → 직접 추출
+    lines = [line.strip() for line in soup.get_text().splitlines() if line.strip()]
+    summarized = "\n".join(lines[:max_lines])
+
+    if summarized and len(summarized) > 50:  # 최소 텍스트 기준 적용
+        print(f"✅ 법령 조문 텍스트 추출 성공 (줄 수: {max_lines})")
+        return summarized
+
+    # 조문이 없으면 iframe 링크 fallback
+    iframe = soup.find("iframe")
+    if iframe and iframe.has_attr("src"):
+        iframe_url = iframe["src"]
+        print(f"📎 iframe 링크 추출됨: {iframe_url}")
+        return f"[법령 본문은 아래 링크에서 확인 가능합니다]\n{iframe_url}"
+
+    print("⚠️ 본문도 없고 iframe도 없음")
+    return "[법령 본문을 추출할 수 없습니다.]"
+
+
+
+
+# import os
+# import requests
+# from bs4 import BeautifulSoup
+# from dotenv import load_dotenv
+
+# load_dotenv()
+# LAW_API_KEY = os.getenv("LAW_API_KEY")
+
+
+# def fetch_law_detail_by_mst(mst: str, max_lines: int = 20) -> str:
+#     """
+#     국가법령정보센터 API를 통해 특정 MST(법령 일련번호)에 해당하는 법령 본문을 가져옴
+#     Args:
+#         mst (str): 법령 MST 값
+#         max_lines (int): 상단 요약 줄 수 (기본 20)
+#     Returns:
+#         str: 상위 max_lines 줄로 요약된 법령 본문
+#     Raises:
+#         Exception: API 요청 실패 시
+#     """
+#     base_url = "http://www.law.go.kr/DRF/lawService.do"
+#     params = {
+#         "OC": LAW_API_KEY,
+#         "target": "law",
+#         "type": "HTML",
+#         "MST": mst
+#     }
+
+#     print(f"📤 법령 API 요청: {params}")
+#     try:
+#         response = requests.get(base_url, params=params, timeout=10)
+#         print(f"📥 응답 코드: {response.status_code}")  # 상태 코드
+
+#         if response.status_code == 200:
+#             print("✅ 응답 수신 완료")
+#             print(response.text[:1000])  # 응답 내용 일부만 출력
+#         else:
+#             print(f"❌ API 실패 응답: {response.text}")
+
+#         response.raise_for_status()
     
-    def __init__(self, api_key: str):
-        """
-        국가법령정보 API 클라이언트 초기화
-        
-        Args:
-            api_key: 발급받은 API 키
-        """
-        self.api_key = api_key
-        self.base_url = "http://www.law.go.kr/DRF/lawSearch.do"
-    
-    def search_law(self, query: str, page: int = 1, count: int = 10) -> Dict[str, Any]:
-        """
-        법령 검색 API 호출
-        
-        Args:
-            query: 검색어
-            page: 페이지 번호
-            count: 한 페이지당 결과 수
-            
-        Returns:
-            API 응답 결과 (딕셔너리)
-        """
-        endpoint = f"{self.base_url}"
-        params = {
-            "OC": self.api_key,
-            "target": "law",  # law: 현행법령, lawSearch: 법령검색
-            "type": "JSON",   # XML 또는 JSON
-            "page": page,
-            "display": count,
-            "query": query
-        }
-        
-        response = requests.get(endpoint, params=params)
-        if response.status_code == 200:
-            return response.json()
-        else:
-            raise Exception(f"API 요청 실패: {response.status_code}, {response.text}")
-    
-    def get_law_detail(self, law_id: str) -> Dict[str, Any]:
-        """
-        특정 법령의 상세 정보 조회
-        
-        Args:
-            law_id: 법령 ID
-            
-        Returns:
-            법령 상세 정보 (딕셔너리)
-        """
-        endpoint = f"{self.base_url}/detail.do"
-        params = {
-            "OC": self.api_key,
-            "target": "law",
-            "type": "JSON",
-            "MST": law_id  # 법령 ID
-        }
-        
-        response = requests.get(endpoint, params=params)
-        if response.status_code == 200:
-            return response.json()
-        else:
-            raise Exception(f"API 요청 실패: {response.status_code}, {response.text}")
-    
-    def get_recent_laws(self, count: int = 10) -> Dict[str, Any]:
-        """
-        최근 제개정된 법령 목록 조회
-        
-        Args:
-            count: 조회할 법령 수
-            
-        Returns:
-            최근 법령 목록 (딕셔너리)
-        """
-        endpoint = f"{self.base_url}/recentLaw.do"
-        params = {
-            "OC": self.api_key,
-            "target": "law",
-            "type": "JSON",
-            "display": count
-        }
-        
-        response = requests.get(endpoint, params=params)
-        if response.status_code == 200:
-            return response.json()
-        else:
-            raise Exception(f"API 요청 실패: {response.status_code}, {response.text}")
-    
-    def extract_relevant_info(self, api_response: Dict[str, Any]) -> List[Dict[str, str]]:
-        """
-        API 응답에서 관련 정보를 추출하여 정리
-        
-        Args:
-            api_response: API 응답 결과
-            
-        Returns:
-            정리된 법령 정보 목록
-        """
-        result = []
-        
-        # API 응답 구조에 따라 데이터 추출 로직 구현
-        if "법령" in api_response:
-            laws = api_response["법령"]
-            for law in laws:
-                law_info = {
-                    "법령명": law.get("법령명", ""),
-                    "법령ID": law.get("법령ID", ""),
-                    "공포일자": law.get("공포일자", ""),
-                    "시행일자": law.get("시행일자", "")
-                }
-                
-                # 법령 내용이 있는 경우
-                if "조문" in law and isinstance(law["조문"], list):
-                    contents = []
-                    for article in law["조문"]:
-                        if "조문내용" in article:
-                            contents.append(f"{article.get('조문번호', '')} {article.get('조문제목', '')}: {article['조문내용']}")
-                    
-                    law_info["조문내용"] = "\n".join(contents)
-                
-                result.append(law_info)
-        
-        return result
+#     except Exception as e:
+#         print(f"[법령 API 오류] {str(e)}")
+#         return None
+
+#     soup = BeautifulSoup(response.text, "html.parser")
+#     lines = [line.strip() for line in soup.get_text().splitlines() if line.strip()]
+#     summarized = "\n".join(lines[:max_lines])
+#     print(f"✅ 법령 요약 완료 (줄 수: {max_lines})")
+#     return summarized
