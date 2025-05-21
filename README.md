@@ -1,7 +1,4 @@
-## 📄 `README.md` (LLM 기반 RAG 시스템 프로젝트용)
-
-
-# 🧠 사내 문서 기반 LLM 질의응답 시스템 (RAG with Ollama + ChromaDB)
+## 🧠 사내 문서 기반 LLM 질의응답 시스템 (RAG with Ollama + ChromaDB)
 
 이 프로젝트는 PDF, TXT, HWP 등 사내 문서를 인덱싱한 후,  
 Gemma3 모델(Ollama)을 활용해 문서 기반 질문에 대한 답변을 제공하는 **LLM 기반 RAG 시스템**입니다.
