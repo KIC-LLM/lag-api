@@ -10,13 +10,13 @@ from config.settings import OLLAMA_API_URL, OLLAMA_MODEL
 load_dotenv()
 LAW_API_KEY = os.getenv("LAW_API_KEY")
 
-# ✅ CSV 로딩
+# CSV 로딩
 law_df = pd.read_csv("data/laws.csv", encoding="utf-8-sig", skiprows=1)
 law_df.columns = law_df.columns.str.strip()
 
 assert "법령명" in law_df.columns and "법령MST" in law_df.columns, "CSV에 필요한 컬럼이 없습니다."
 
-# ✅ 키워드 기반 법령명 → MST 추출
+# 키워드 기반 법령명 → MST 추출
 def normalize(text):
     return text.replace(" ", "").strip().lower()
 
@@ -36,7 +36,7 @@ def find_law_mst_by_keyword(keyword: str):
         return {"법령명": row["법령명"], "MST": str(int(row["법령MST"]))}
     return None
 
-# ✅ 4. 통합 질의 함수
+# 통합 질의 함수
 def run_rag_query_with_api(collection, user_query: str):
     law = find_law_mst_by_keyword(user_query)
     print("📌 law 객체:", law)
@@ -49,7 +49,7 @@ def run_rag_query_with_api(collection, user_query: str):
         if not api_context.strip():
             print("⚠️ API 응답이 비어 있습니다.")
 
-    # ✅ RAG 문서 검색
+    # RAG 문서 검색
     results = collection.query(query_texts=[user_query], n_results=5)
     if not results["documents"] or not results["documents"][0]:
         rag_chunks = ["[RAG 문서가 검색되지 않았습니다.]"]
@@ -62,7 +62,7 @@ def run_rag_query_with_api(collection, user_query: str):
 
     rag_text = "\n".join([f"- {chunk.strip()}" for chunk in rag_chunks[:5]])
 
-    # ✅ 문맥 구성
+    # 문맥 구성
     full_context = f"""
 [외부정보: 국가법령정보 API 요약]
 {api_context}
@@ -84,7 +84,7 @@ def run_rag_query_with_api(collection, user_query: str):
 # 답변:
 """.strip()
 
-    # ✅ LLM 질의 (Ollama)
+    # LLM 질의 (Ollama)
     try:
         response = requests.post(
             OLLAMA_API_URL,
